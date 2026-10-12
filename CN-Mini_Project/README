@@ -1,0 +1,105 @@
+# TCP Traffic Generation Module
+
+**Computer Networks Mini-Project:** Network Intrusion Detection and Response  
+**Contributor:** Pranaya  
+**Environment:** macOS, Python 3, VS Code
+
+## Overview
+
+This module generates TCP traffic and records structured connection events to support testing of a network intrusion detection prototype.
+
+## Files
+
+- `tcp_server.py` — TCP server that accepts client connections.
+- `tcp_client.py` — Basic TCP client.
+- `event_logger.py` — Writes connection events to JSONL.
+- `traffic_generator.py` — Generates normal traffic and controlled localhost port attempts.
+- `summarize_logs.py` — Summarizes logged events.
+- `test_event_logger.py` — Automated event-logger tests.
+- `test_traffic_generator.py` — Automated traffic-generator tests.
+- `logs/traffic_events.jsonl` — Generated traffic-event log.
+
+## Requirements
+
+- Python 3
+- No third-party Python packages required.
+
+## How to Run
+
+Start the server in Terminal 1:
+
+```bash
+python3 tcp_server.py
+```
+
+Generate five normal TCP connections in Terminal 2:
+
+```bash
+python3 traffic_generator.py normal --count 5
+```
+
+Run the controlled localhost port test:
+
+```bash
+python3 traffic_generator.py ports
+```
+
+View the log:
+
+```bash
+cat logs/traffic_events.jsonl
+```
+
+Summarize recorded events:
+
+```bash
+python3 summarize_logs.py
+```
+
+Run all automated tests:
+
+```bash
+python3 -m unittest -v
+```
+
+Check Python syntax:
+
+```bash
+python3 -m py_compile tcp_server.py tcp_client.py event_logger.py traffic_generator.py summarize_logs.py test_event_logger.py test_traffic_generator.py
+```
+
+## Event Format
+
+Events include:
+
+- `event_type`
+- `source_ip`
+- `destination_ip`
+- `destination_port`
+- `timestamp`
+- `timestamp_utc`
+- `status`
+
+The logger records one JSON object per line.
+
+## Observed Local Test Results
+
+- Five normal TCP connections succeeded during the manual test.
+- One connection to localhost port 5000 succeeded during the port test.
+- Connections to localhost ports 5001, 5002, 8000, and 8080 were refused during that test.
+- The log summary reported 17 valid records and zero invalid records at the time of inspection.
+- Four automated unit tests passed.
+
+These are results from the recorded local test run, not measurements of the integrated SDN system.
+
+## Limitations and Integration
+
+The current tests use `127.0.0.1`. The generator logs outgoing connection attempts, while the server logs accepted connections. These can describe the same successful connection and must not be counted as independent connections without deduplication.
+
+A refused connection alone does not prove an intrusion. The module has not yet been integrated with the team's IDS, Mininet, Open vSwitch, or Ryu controller.
+
+During integration, the team must agree on which traffic events the IDS should consume and validate detection, SDN blocking, legitimate-traffic behavior, and response timing.
+
+## Contribution
+
+TCP socket programming, traffic generation, event logging, local testing, and documentation.
